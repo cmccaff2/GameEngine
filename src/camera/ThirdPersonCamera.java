@@ -4,7 +4,6 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.util.vector.Vector3f;
 
 import entities.Player;
-import toolbox.Maths;
 
 public class ThirdPersonCamera extends Camera{
 	private Player focalPoint;
@@ -13,23 +12,23 @@ public class ThirdPersonCamera extends Camera{
 	
 	public ThirdPersonCamera(Player focalPoint) {
 		this.focalPoint = focalPoint;
-		
+		this.pitch = 20;
 		this.roll = 0;
 		this.xSensitivity = (float) 0.25;
 		this.ySensitivity = (float) 0.5;
 	}
 	
-	public void move() {
+	public void move(float mouseDX, float mouseDY) {
 		calculateZoom();
-		calculatePitch();
-		calculateAngleAroundPlayer();
+		calculatePitch(mouseDY);
+		calculateAngleAroundPlayer(mouseDX);
 		
 		float horizontalDistance = calculateHorizontalDistance();
 		float verticalDistance = calculateVerticalDistance();
 		
 		calculateCameraPosition(horizontalDistance, verticalDistance);
 	
-		this.yaw = 0 - (focalPoint.getRotY() + angleAroundPlayer);
+		this.yaw = 0 - (focalPoint.getRotY() - angleAroundPlayer);
 	
 	}
 	
@@ -55,12 +54,14 @@ public class ThirdPersonCamera extends Camera{
 	private void calculateZoom() {
 		float zoomLevel = Mouse.getDWheel() * 0.1f;
 		distanceToFocal -= zoomLevel;
+		if (distanceToFocal < 5) {
+			distanceToFocal = 5;
+		}
 	}
 	
-	private void calculatePitch() {
-		float mouseY = Mouse.getDY();
+	private void calculatePitch(float mouseDY) {
 		if (Mouse.isButtonDown(1)){
-			float pitchChange = mouseY;
+			float pitchChange = mouseDY;
 			this.pitch-= pitchChange;
 		}
 		
@@ -68,10 +69,11 @@ public class ThirdPersonCamera extends Camera{
 		if (this.pitch > 90) {this.pitch = 90;}
 	}
 	
-	private void calculateAngleAroundPlayer() {
-		if (Mouse.isButtonDown(1)){
-			float yawChange = Mouse.getDX() * 0.3f;
-			angleAroundPlayer-= yawChange;
+	private void calculateAngleAroundPlayer(float mouseDX) {
+		if (Mouse.isButtonDown(0)){
+			float yawChange = mouseDX * 0.3f;
+			angleAroundPlayer+= yawChange;
+			//this.yaw -= yawChange;
 		}
 	}
 	

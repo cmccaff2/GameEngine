@@ -49,6 +49,14 @@ public class DisplayManager {
 		return delta;
 	}
 	
+	public static float getHeight() {
+		return HEIGHT;
+	}
+	
+	public static float getWidth() {
+		return WIDTH;
+	}
+	
 	// Returns current time in milliseconds
 	private static long getCurrentTime() { 
 		return Sys.getTime()*1000 / Sys.getTimerResolution();

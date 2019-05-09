@@ -10,10 +10,12 @@ import org.lwjgl.util.vector.Vector3f;
 import camera.Camera;
 import camera.FreeCam;
 import camera.ThirdPersonCamera;
+import camera.TopDownCamera;
 import entities.Entity;
 import entities.Light;
 import entities.ObjLoader;
 import entities.Player;
+import entities.TopDownPlayer;
 import models.RawModel;
 import models.TexturedModel;
 import objConverter.ModelData;
@@ -21,6 +23,8 @@ import objConverter.OBJFileLoader;
 import renderEngine.DisplayManager;
 import renderEngine.Loader;
 import renderEngine.MasterRenderer;
+import terrain.HeightMapTerrain;
+import terrain.RandomTerrain;
 import terrain.Terrain;
 import textures.ModelTexture;
 
@@ -36,6 +40,7 @@ public class MainLoop {
 		loader = new Loader();
 		
 		// Create level
+		//RandomLevel level = new RandomLevel(loader);
 		DefaultLevel level = new DefaultLevel(loader);
 		
 		// Create player
@@ -52,6 +57,7 @@ public class MainLoop {
 		ArrayList<Entity> entities = level.getEntities();
 		
 		// Get level terrain
+		//ArrayList<RandomTerrain> terrains = level.getTerrain();
 		ArrayList<Terrain> terrains = level.getTerrain();
 		
 		// Get level Lighting
@@ -59,10 +65,21 @@ public class MainLoop {
 		
 		MasterRenderer renderer = new MasterRenderer();
 		while(!Display.isCloseRequested()) {
-
+			
 			//game logic
-			player.move();
-			camera.move();
+			Vector3f playerPosition = player.getPosition();
+			float terrainHeight = 0;
+			for (Terrain terrain : terrains) { 
+				if(terrain.onTerrain(playerPosition.x, playerPosition.z)) { // If player is on terrain piece
+					terrainHeight = terrain.getHeightOfTerrain(playerPosition.x, playerPosition.z);
+				}
+			}
+			
+			float mouseDY = Mouse.getDY();
+			float mouseDX = Mouse.getDX();
+			
+			player.move(mouseDX, 1 + terrainHeight);
+			camera.move(mouseDX, mouseDY);
 			
 			// Rendering
 			for (Entity entitiy : entities) { // Render entities
@@ -70,6 +87,7 @@ public class MainLoop {
 			}
 			
 			for (Terrain terrain : terrains) { // Render terrain
+				terrain.getHeightOfTerrain(player.getPosition().x, player.getPosition().z);
 				renderer.processTerrain(terrain);
 			}
 			
