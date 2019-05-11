@@ -33,10 +33,7 @@ public class Player extends Entity{
 		float timePassed = DisplayManager.getFrameTimeSeconds();
 		
 		this.increasePosition(dXYZ.x * timePassed, dXYZ.y * timePassed, dXYZ.z * timePassed);
-		this.increaseRotation(0, -drXYZ.y, 0);
-		
-		System.out.println("Player X: "+super.position.x);
-		System.out.println("Player Z: "+super.position.z);
+		this.increaseRotation(0, drXYZ.y, 0);
 		
 		//float terrainHeight = 1;
 		if (super.position.y > terrainHeight) {
@@ -53,11 +50,11 @@ public class Player extends Entity{
 	}
 	
 	protected void checkMouseInput(float mouseDX) {
-		drXYZ.y = mouseDX * xSensitivity;		
+		drXYZ.y = -mouseDX * xSensitivity;		
 	}
 	
 	private void checkKeyboardInput(float terrainHeight) {
-		Vector3f position = this.getPosition();
+		//Vector3f position = this.getPosition();
 		if(Keyboard.isKeyDown(Keyboard.KEY_W)) {
 			this.dXYZ.x = run_speed * directionFacing.x;
 			this.dXYZ.z = run_speed * directionFacing.z;

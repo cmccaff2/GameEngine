@@ -7,13 +7,13 @@ public class FreeCam extends Camera{
 	private float speed = (float) 0.5;
 	
 	public FreeCam() {
-		this.roll = 0;
-		this.xSensitivity = (float) 0.25;
-		this.ySensitivity = (float) 0.5;
+		super();
 	}
 	
-	public void move() {
-		
+	public void move(float mouseDX, float mouseDY) {
+		System.out.println("Gaze z: "+gaze.z);
+		System.out.println("Gaze.x: "+gaze.x);
+		System.out.println("Pitch: "+this.pitch);
 		if(Keyboard.isKeyDown(Keyboard.KEY_W)) {
 			position.x += speed * gaze.x;
 			position.y += speed * gaze.y;
@@ -44,32 +44,14 @@ public class FreeCam extends Camera{
 			this.yaw = 0;
 		}
 		
-		/*if(Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) {
-			this.run_speed = (float) 0.5;
+		if(Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) {
+			this.speed = (float) 0.5;
 		}else {
-			this.run_speed = (float) 0.25;
+			this.speed = (float) 0.25;
 		}
 		
-		/* Vertical Mouse movement */
-		this.pitch -= Mouse.getDY() * ySensitivity;
 		
-		/* Horizontal Mouse movement */
-		this.yaw += Mouse.getDX() * xSensitivity;
-		
-		// Limit vertical mouse movement
-		if (this.pitch > 90) {
-			this.pitch = 90;
-		}else if (this.pitch < -90) {
-			this.pitch = -90;
-		}
+		super.rotate(mouseDY * ySensitivity, mouseDX * xSensitivity, 0);
 
-		// Wrap pitch
-		if (this.yaw > 180) {
-			this.yaw = -180;
-		}else if (this.yaw < -180) {
-			this.yaw = 180;
-		}
-		
-		determineGaze();
 	}
 }

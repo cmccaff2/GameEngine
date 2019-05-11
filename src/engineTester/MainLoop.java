@@ -8,6 +8,7 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.util.vector.Vector3f;
 
 import camera.Camera;
+import camera.FirstPersonCamera;
 import camera.FreeCam;
 import camera.ThirdPersonCamera;
 import camera.TopDownCamera;
@@ -31,6 +32,7 @@ import textures.ModelTexture;
 public class MainLoop {
 	
 	private static Loader loader;
+	private static Camera camera;
 	
 	public static void main(String[] args) {
 
@@ -50,7 +52,7 @@ public class MainLoop {
 		Player player = new Player(playerTextured, new Vector3f(0,0,15), 0, 0, 0, 1);
 		
 		// Set up camera
-		ThirdPersonCamera camera = new ThirdPersonCamera(player);
+		camera = new ThirdPersonCamera(player);
 		//FreeCam camera = new FreeCam();
 		
 		// Get level entities
@@ -67,9 +69,11 @@ public class MainLoop {
 		while(!Display.isCloseRequested()) {
 			
 			//game logic
+			pollInput(player);
+			
 			Vector3f playerPosition = player.getPosition();
 			float terrainHeight = 0;
-			for (Terrain terrain : terrains) { 
+			for (Terrain terrain : terrains) { // Calculate height of terrain at player's position
 				if(terrain.onTerrain(playerPosition.x, playerPosition.z)) { // If player is on terrain piece
 					terrainHeight = terrain.getHeightOfTerrain(playerPosition.x, playerPosition.z);
 				}
@@ -108,33 +112,14 @@ public class MainLoop {
 	}
 	
 	
-	/*public static Entity buildPlane(int x, int y, int z) {
-		// Create a rectangle made from 2 triangles
-				float[] vertices = {			
-						-0.5f,0.5f,0,	
-						-0.5f,-0.5f,0,	
-						0.5f,-0.5f,0,	
-						0.5f,0.5f,0,		
-				};
-				
-				float[] textureCoords = {
-						0,0,
-						0,1,
-						1,1,
-						1,0									
-				};
-				
-				int[] indices = {
-						0,1,3,	
-						3,1,2,	
-				};
-				
-				RawModel model = loader.loadToVAO(vertices, textureCoords, indices); // load vertices into a vao to create a model
-				ModelTexture texture = new ModelTexture(loader.loadTexture("minecraft_dirt"));
-				TexturedModel texturedModel = new TexturedModel(model,texture);
-				
-				Entity plane = new Entity(texturedModel, new Vector3f(x,y,z),0,0,0,1);
-				return plane;
-	}*/
+	private static void pollInput(Player player) {
+		if(Keyboard.isKeyDown(Keyboard.KEY_1)) {
+			camera = new FirstPersonCamera(player);
+		}else if(Keyboard.isKeyDown(Keyboard.KEY_2)) {
+			camera = new ThirdPersonCamera(player);
+		}else if(Keyboard.isKeyDown(Keyboard.KEY_3)) {
+			camera = new FreeCam();
+		}
+	}
 
 }

@@ -12,13 +12,11 @@ public class TopDownCamera extends Camera{
 	private float distanceToFocal = 50;
 	
 	public TopDownCamera(Player focalPoint) {
+		super();
 		this.focalPoint = focalPoint;
-		
-		this.roll = 0;
 		this.pitch = 90;
 		this.yaw = 0;
-		this.xSensitivity = (float) 0.25;
-		this.ySensitivity = (float) 0.5;
+
 	}
 	
 	public void move() {

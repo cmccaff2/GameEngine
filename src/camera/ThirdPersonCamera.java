@@ -3,19 +3,17 @@ package camera;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.util.vector.Vector3f;
 
-import entities.Player;
+import entities.Entity;
 
 public class ThirdPersonCamera extends Camera{
-	private Player focalPoint;
+	private Entity focalPoint;
 	private float distanceToFocal = 50;
 	private float angleAroundPlayer = 0;
 	
-	public ThirdPersonCamera(Player focalPoint) {
+	public ThirdPersonCamera(Entity focalPoint) {
+		super();
 		this.focalPoint = focalPoint;
 		this.pitch = 20;
-		this.roll = 0;
-		this.xSensitivity = (float) 0.25;
-		this.ySensitivity = (float) 0.5;
 	}
 	
 	public void move(float mouseDX, float mouseDY) {
@@ -64,7 +62,7 @@ public class ThirdPersonCamera extends Camera{
 			float pitchChange = mouseDY;
 			this.pitch-= pitchChange;
 		}
-		
+				
 		if (this.pitch < 0) {this.pitch = 0;}
 		if (this.pitch > 90) {this.pitch = 90;}
 	}
@@ -73,7 +71,6 @@ public class ThirdPersonCamera extends Camera{
 		if (Mouse.isButtonDown(0)){
 			float yawChange = mouseDX * 0.3f;
 			angleAroundPlayer+= yawChange;
-			//this.yaw -= yawChange;
 		}
 	}
 	

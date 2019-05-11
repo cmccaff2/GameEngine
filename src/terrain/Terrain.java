@@ -51,8 +51,6 @@ public class Terrain {
 		float terrainY = worldZ - this.getZ();
 		
 		if (terrainX < SIZE && terrainX > 0 && terrainY < SIZE && terrainY > 0) {
-			System.out.println("TerrainX: "+terrainX);
-			System.out.println("TerrainY: "+terrainY);
 			return true;
 		}
 		
