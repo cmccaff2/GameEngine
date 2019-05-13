@@ -69,6 +69,25 @@ public class Maths {
 		float l3 = 1.0f - l1 - l2;
 		return l1 * p1.y + l2 * p2.y + l3 * p3.y;
 	}
+	
+	public static Vector3f calculateSlope(Vector3f p1, Vector3f p2, Vector3f p3) {
+		// Calculate the normal of the triangle face
+		Vector3f U = new Vector3f();
+		Vector3f.sub(p2, p3, U);
+		Vector3f V = new Vector3f();
+		Vector3f.sub(p1, p3, V);
+		Vector3f normal = new Vector3f();
+		Vector3f.cross(U, V, normal);
+		normal.normalise(); 
+		
+		// Reference normal representing up
+		Vector3f surfaceNormal = new Vector3f(0, 1, 0);
+		
+		// Angle between normals
+		double angle = Math.acos(Math.toRadians(Vector3f.dot(normal, surfaceNormal)));
+		
+		return normal;
+	}
 }
 
 

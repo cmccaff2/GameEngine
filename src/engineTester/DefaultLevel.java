@@ -1,16 +1,19 @@
 package engineTester;
 
-import java.util.ArrayList;
-
+import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
 import org.lwjgl.util.vector.Vector3f;
 
+import camera.Camera;
 import entities.Entity;
 import entities.Light;
+import entities.PhysicsEntity;
 import models.RawModel;
 import models.TexturedModel;
 import objConverter.ModelData;
 import objConverter.OBJFileLoader;
 import renderEngine.Loader;
+import renderEngine.MasterRenderer;
 import terrain.HeightMapTerrain;
 import terrain.Terrain;
 import textures.ModelTexture;
@@ -18,14 +21,25 @@ import textures.TerrainTexture;
 import textures.TerrainTexturePack;
 
 public class DefaultLevel extends Level{
-
+	private TexturedModel texturedSphere;
+	private boolean Fdown = false;
+	private boolean Gdown = false;
+	
 	public DefaultLevel(Loader loader) {
 		super(loader);
+		this.loader = loader;
+		
+
 		
 		// Initialize stall textured model
 		ModelData data = OBJFileLoader.loadOBJ("stall");
 		RawModel stallModel = loader.loadToVAO(data.getVertices(), data.getTextureCoords(), data.getNormals(), data.getIndices());
 		TexturedModel stallTextured = new TexturedModel(stallModel, new ModelTexture(loader.loadTexture("stallTexture")));
+		
+		// Initialize sphere textured model
+		 data = OBJFileLoader.loadOBJ("sphere");
+		RawModel sphereModel = loader.loadToVAO(data.getVertices(), data.getTextureCoords(), data.getNormals(), data.getIndices());
+		this.texturedSphere = new TexturedModel(sphereModel, new ModelTexture(loader.loadTexture("minecraft_dirt")));
 		
 		// Initialize shiny dragon textured model
 		data = OBJFileLoader.loadOBJ("dragon");
@@ -161,5 +175,83 @@ public class DefaultLevel extends Level{
 
 		// Make lights
 		light = new Light(new Vector3f(0, 1000, 1000), new Vector3f(1, 1, 1));
+		
+		// Initialize a player entity
+		createPlayer(0, 0, 15);
+		
+		for (Entity entity : entities) { // Add entities to the renderer
+			MasterRenderer.processEntity(entity);
+		}
+		
+		for (Terrain terrain : terrains) {
+			MasterRenderer.processTerrain(terrain);
+		}
+		
+		MasterRenderer.processEntity(player);
+	}
+
+	@Override
+	public void tick(Camera camera) {
+		/*Player Movement*/
+		Vector3f playerPosition = player.getPosition();
+		float terrainHeight = 0;
+		for (Terrain terrain : terrains) { // Calculate height of terrain at player's position
+			if(terrain.onTerrain(playerPosition.x, playerPosition.z)) { // If player is on terrain piece
+				terrainHeight = terrain.getHeightOfTerrain(playerPosition.x, playerPosition.z);
+			}
+		}
+		
+		float mouseDY = Mouse.getDY();
+		float mouseDX = Mouse.getDX();
+		
+		player.move(mouseDX, player.getScale() + terrainHeight);
+		camera.move(mouseDX, mouseDY);
+		/*******************/
+
+		//System.out.println("X: "+gaze.x);
+		//System.out.println("Y: "+gaze.y);
+		//System.out.println("Z: "+gaze.z);
+		
+		/* Input */
+		if (Keyboard.isKeyDown(Keyboard.KEY_F) && !Fdown) { // Spawn sphere
+			Fdown = true;
+			fireBall(0, 0, 0);
+		}else if (!Keyboard.isKeyDown(Keyboard.KEY_F)){
+			Fdown = false;
+		}
+		
+		if (Keyboard.isKeyDown(Keyboard.KEY_G) && !Gdown) { // Spawn sphere
+			Gdown = true;
+			fireBall(50, 50, 50);
+		}else if (!Keyboard.isKeyDown(Keyboard.KEY_G)){
+			Gdown = false;
+		}
+		
+		if (Keyboard.isKeyDown(Keyboard.KEY_R)) { // Clear spheres
+			physicsEntities.clear();
+		}
+		/*********/
+		
+		/* Level Physics */
+		for (PhysicsEntity physEntity : physicsEntities) {
+			physEntity.tick(terrains);
+		}
+		
+		
+		/****************/
+	}
+	
+	public PhysicsEntity createSphere(float x, float y, float z) {
+		return new PhysicsEntity(this.texturedSphere, new Vector3f(x, y, z), 0, 0, 0, 0.1f);
+	}
+	
+	public void fireBall(float xSpeed, float ySpeed, float zSpeed) {
+		Vector3f position = player.getPosition();
+		Vector3f gaze = player.getGaze();
+
+		PhysicsEntity sphere = createSphere(position.x + gaze.x * 6, position.y + 8, position.z + gaze.z * 6);
+		sphere.setdXYZ(new Vector3f(gaze.x * xSpeed, -10, gaze.z * zSpeed));
+		physicsEntities.add(sphere);
+		MasterRenderer.processEntity(sphere);
 	}
 }

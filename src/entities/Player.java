@@ -35,7 +35,6 @@ public class Player extends Entity{
 		this.increasePosition(dXYZ.x * timePassed, dXYZ.y * timePassed, dXYZ.z * timePassed);
 		this.increaseRotation(0, drXYZ.y, 0);
 		
-		//float terrainHeight = 1;
 		if (super.position.y > terrainHeight) {
 			this.dXYZ.y -= 0.2;
 		} else if (super.position.y < terrainHeight){
@@ -112,5 +111,9 @@ public class Player extends Entity{
 	
 	public Vector3f getDXYZ() {
 		return this.dXYZ;
+	}
+	
+	public Vector3f getGaze() {
+		return this.directionFacing;
 	}
 }

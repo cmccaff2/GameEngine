@@ -36,8 +36,8 @@ public class MasterRenderer {
 	private TerrainShader terrainShader = new TerrainShader();
 	
 	// Hold models and all their associated entities
-	private Map<TexturedModel, List<Entity>> entities = new HashMap<TexturedModel, List<Entity>>();
-	private List<Terrain> terrains = new ArrayList<Terrain>();
+	private static Map<TexturedModel, List<Entity>> entities = new HashMap<TexturedModel, List<Entity>>();
+	private static List<Terrain> terrains = new ArrayList<Terrain>();
 	
 	public MasterRenderer() {
 		enableCulling();
@@ -69,15 +69,13 @@ public class MasterRenderer {
 		terrainShader.loadViewMatrix(camera);
 		terrainRenderer.render(terrains);
 		terrainShader.stop();
-		terrains.clear();
-		entities.clear();
 	}
 	
-	public void processTerrain(Terrain terrain) {
+	public static void processTerrain(Terrain terrain) {
 		terrains.add(terrain);
 	}
 	
-	public void processEntity(Entity entity) {
+	public static void processEntity(Entity entity) {
 		TexturedModel entityModel = entity.getModel(); // find the model used by the entity
 		List<Entity> batch = entities.get(entityModel); // List corresponding to the model
 		
@@ -113,6 +111,8 @@ public class MasterRenderer {
 	}
 	
 	public void cleanUp() {
+		terrains.clear();
+		entities.clear();
 		shader.cleanUp();
 		terrainShader.cleanUp();
 	}

@@ -1,5 +1,7 @@
 package terrain;
 
+import org.lwjgl.util.vector.Vector3f;
+
 import models.RawModel;
 import renderEngine.Loader;
 import textures.TerrainTexture;
@@ -70,6 +72,18 @@ public class RandomTerrain  extends Terrain{
 		height /= MAX_PIXEL_COLOUR/2f;
 		height *= MAX_HEIGHT;
 		return height;
+	}
+
+	@Override
+	public float getHeightOfTerrain(float x2, float z2) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public Vector3f getSlopeOfTerrain(float worldX, float worldZ) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

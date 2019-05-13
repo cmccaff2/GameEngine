@@ -1,12 +1,14 @@
 package terrain;
 
+import org.lwjgl.util.vector.Vector3f;
+
 import models.RawModel;
 import renderEngine.Loader;
 import textures.ModelTexture;
 import textures.TerrainTexture;
 import textures.TerrainTexturePack;
 
-public class Terrain {
+public abstract class Terrain {
 	
 	private static final float SIZE = 400;
 	
@@ -57,9 +59,8 @@ public class Terrain {
 		return false;
 	}
 
-	public float getHeightOfTerrain(float x2, float z2) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+	public abstract float getHeightOfTerrain(float x2, float z2);
+	
+	public abstract Vector3f getSlopeOfTerrain(float worldX, float worldZ);
 
 }

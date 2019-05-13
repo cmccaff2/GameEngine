@@ -23,6 +23,7 @@ public class HeightMapTerrain extends Terrain{
 	private static final float MAX_PIXEL_COLOUR = 256*256*256;
 	
 	private float[][] heights;
+	private BufferedImage image;
 	
 	public HeightMapTerrain (int gridX, int gridZ, Loader loader, TerrainTexturePack texturePack, TerrainTexture blendMap, String heightMap) {
 		super(gridX, gridZ, loader, texturePack, blendMap);
@@ -32,7 +33,7 @@ public class HeightMapTerrain extends Terrain{
 
 	private RawModel generateTerrain(Loader loader, String heightMap){
 		
-		BufferedImage image = null;
+		image = null;
 		try {
 			image = ImageIO.read(new File("res/" + heightMap + ".png"));
 		} catch (IOException e) {
@@ -118,6 +119,36 @@ public class HeightMapTerrain extends Terrain{
 		}
 
 		return height;
+
+	}
+	
+	public Vector3f getSlopeOfTerrain(float worldX, float worldZ) {
+		int terrainX = (int) (worldX - this.getX());
+		int terrainZ = (int) (worldZ - this.getZ());
+		float gridSquareSize = SIZE / ((float)heights.length - 1);
+		int gridX = (int) Math.floor(terrainX / gridSquareSize); // Find which grid of the terrain this point falls on
+		int gridZ = (int) Math.floor(terrainZ / gridSquareSize);
+
+		if(gridX >= heights.length - 1 || gridZ >= heights.length - 1 || gridX < 0 || gridZ < 0) {
+			return new Vector3f(0,0,0);
+		}
+		
+		float xCoord = (terrainX % gridSquareSize)/gridSquareSize; // Find where on the grid the point is from (0,0) to (1,1)
+		float zCoord = (terrainZ % gridSquareSize)/gridSquareSize;
+
+		Vector3f slope;
+		
+		if (xCoord <= (1-zCoord)) { // Top left triangle
+			slope = Maths.calculateSlope(new Vector3f(0, heights[gridX][gridZ], 0), new Vector3f(1,
+							heights[gridX + 1][gridZ], 0), new Vector3f(0,
+							heights[gridX][gridZ + 1], 1));
+		} else { // Bottom right triangle
+			slope = Maths.calculateSlope(new Vector3f(1, heights[gridX + 1][gridZ], 0), new Vector3f(1,
+							heights[gridX + 1][gridZ + 1], 1), new Vector3f(0,
+							heights[gridX][gridZ + 1], 1));
+		}
+
+		return slope;
 
 	}
 	
