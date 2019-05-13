@@ -9,18 +9,28 @@ import models.TexturedModel;
 import renderEngine.DisplayManager;
 import terrain.Terrain;
 
-public class PhysicsEntity extends Entity{
+public class PhysicsPlayer extends Player{
+
 	protected float lastBounceTime = 0;
 	
 	protected float gravity = 9.8f;
 	protected float bounciness = 0.8f;
 	protected float friction = 0.95f;
-	protected Vector3f dXYZ = new Vector3f(0,0,0); // Positional momentum
-	protected Vector3f drXYZ = new Vector3f(0,0,0); // Rotational momentum
 	
-	public PhysicsEntity(TexturedModel model, Vector3f position, float rotX, float rotY, float rotZ, float scale) {
+	public PhysicsPlayer(TexturedModel model, Vector3f position, float rotX, float rotY, float rotZ, float scale) {
 		super(model, position, rotX, rotY, rotZ, scale);
 		// TODO Auto-generated constructor stub
+	}
+	
+	public void move(float mouseDX, float terrainHeight) {
+		checkKeyboardInput(terrainHeight);
+		checkMouseInput(mouseDX);
+		determineGaze();
+		
+		float timePassed = DisplayManager.getFrameTimeSeconds();
+		
+		this.increaseRotation(0, drXYZ.y, 0);
+		
 	}
 	
 	public void tick(ArrayList<Terrain> terrains) {
@@ -126,5 +136,7 @@ public class PhysicsEntity extends Entity{
 	public void setdrXYZ(Vector3f drXYZ) {
 		this.drXYZ = drXYZ;
 	}
+	
+	
 
 }

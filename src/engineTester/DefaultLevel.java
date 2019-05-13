@@ -24,6 +24,7 @@ public class DefaultLevel extends Level{
 	private TexturedModel texturedSphere;
 	private boolean Fdown = false;
 	private boolean Gdown = false;
+	private boolean Hdown = false;
 	
 	public DefaultLevel(Loader loader) {
 		super(loader);
@@ -198,13 +199,15 @@ public class DefaultLevel extends Level{
 		for (Terrain terrain : terrains) { // Calculate height of terrain at player's position
 			if(terrain.onTerrain(playerPosition.x, playerPosition.z)) { // If player is on terrain piece
 				terrainHeight = terrain.getHeightOfTerrain(playerPosition.x, playerPosition.z);
+				System.out.println(terrainHeight);
+
 			}
 		}
 		
 		float mouseDY = Mouse.getDY();
 		float mouseDX = Mouse.getDX();
-		
 		player.move(mouseDX, player.getScale() + terrainHeight);
+		player.tick();
 		camera.move(mouseDX, mouseDY);
 		/*******************/
 
@@ -222,9 +225,15 @@ public class DefaultLevel extends Level{
 		
 		if (Keyboard.isKeyDown(Keyboard.KEY_G) && !Gdown) { // Spawn sphere
 			Gdown = true;
-			fireBall(50, 50, 50);
+			fireBall(50, 0, 50);
 		}else if (!Keyboard.isKeyDown(Keyboard.KEY_G)){
 			Gdown = false;
+		}
+		if (Keyboard.isKeyDown(Keyboard.KEY_H) && !Hdown) { // Spawn sphere
+			Hdown = true;
+			createBallAtHeight(terrainHeight);
+		}else if (!Keyboard.isKeyDown(Keyboard.KEY_H)){
+			Hdown = false;
 		}
 		
 		if (Keyboard.isKeyDown(Keyboard.KEY_R)) { // Clear spheres
@@ -242,7 +251,7 @@ public class DefaultLevel extends Level{
 	}
 	
 	public PhysicsEntity createSphere(float x, float y, float z) {
-		return new PhysicsEntity(this.texturedSphere, new Vector3f(x, y, z), 0, 0, 0, 0.1f);
+		return new PhysicsEntity(this.texturedSphere, new Vector3f(x, y, z), 0, 0, 0, 0.05f);
 	}
 	
 	public void fireBall(float xSpeed, float ySpeed, float zSpeed) {
@@ -250,7 +259,16 @@ public class DefaultLevel extends Level{
 		Vector3f gaze = player.getGaze();
 
 		PhysicsEntity sphere = createSphere(position.x + gaze.x * 6, position.y + 8, position.z + gaze.z * 6);
-		sphere.setdXYZ(new Vector3f(gaze.x * xSpeed, -10, gaze.z * zSpeed));
+		sphere.setdXYZ(new Vector3f(gaze.x * xSpeed, gaze.y * ySpeed, gaze.z * zSpeed));
+		physicsEntities.add(sphere);
+		MasterRenderer.processEntity(sphere);
+	}
+	
+	public void createBallAtHeight(float height) {
+		Vector3f position = player.getPosition();
+		Vector3f gaze = player.getGaze();
+
+		PhysicsEntity sphere = createSphere(position.x + gaze.x * 6, height, position.z + gaze.z * 6);
 		physicsEntities.add(sphere);
 		MasterRenderer.processEntity(sphere);
 	}

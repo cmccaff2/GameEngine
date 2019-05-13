@@ -8,6 +8,7 @@ import camera.Camera;
 import entities.Entity;
 import entities.Light;
 import entities.PhysicsEntity;
+import entities.PhysicsPlayer;
 import entities.Player;
 import models.RawModel;
 import models.TexturedModel;
@@ -53,6 +54,13 @@ public abstract class Level {
 		RawModel playerModel = loader.loadToVAO(data.getVertices(), data.getTextureCoords(), data.getNormals(), data.getIndices());
 		TexturedModel playerTextured = new TexturedModel(playerModel, new ModelTexture(loader.loadTexture("Stone")));
 		this.player = new Player(playerTextured, new Vector3f(x,y,z), 0, 0, 0, 1);
+	}
+	
+	public void createPhysicsPlayer(int x, int y, int z) {
+		ModelData data = OBJFileLoader.loadOBJ("sphere");
+		RawModel playerModel = loader.loadToVAO(data.getVertices(), data.getTextureCoords(), data.getNormals(), data.getIndices());
+		TexturedModel playerTextured = new TexturedModel(playerModel, new ModelTexture(loader.loadTexture("Stone")));
+		this.player = new PhysicsPlayer(playerTextured, new Vector3f(x,y,z), 0, 0, 0, 0.05f);
 	}
 	
 	public Player getPlayer() {

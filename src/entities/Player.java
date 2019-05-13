@@ -52,7 +52,7 @@ public class Player extends Entity{
 		drXYZ.y = -mouseDX * xSensitivity;		
 	}
 	
-	private void checkKeyboardInput(float terrainHeight) {
+	protected void checkKeyboardInput(float terrainHeight) {
 		//Vector3f position = this.getPosition();
 		if(Keyboard.isKeyDown(Keyboard.KEY_W)) {
 			this.dXYZ.x = run_speed * directionFacing.x;
@@ -107,6 +107,10 @@ public class Player extends Entity{
 		}else {
 			this.run_speed = (float) 20;
 		}
+	}
+	
+	public void tick() {
+		
 	}
 	
 	public Vector3f getDXYZ() {
