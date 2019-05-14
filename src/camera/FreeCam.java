@@ -11,9 +11,9 @@ public class FreeCam extends Camera{
 	}
 	
 	public void move(float mouseDX, float mouseDY) {
-		System.out.println("Gaze z: "+gaze.z);
-		System.out.println("Gaze.x: "+gaze.x);
-		System.out.println("Pitch: "+this.pitch);
+		//System.out.println("Gaze z: "+gaze.z);
+		//System.out.println("Gaze.x: "+gaze.x);
+		//System.out.println("Pitch: "+this.pitch);
 		if(Keyboard.isKeyDown(Keyboard.KEY_W)) {
 			position.x += speed * gaze.x;
 			position.y += speed * gaze.y;

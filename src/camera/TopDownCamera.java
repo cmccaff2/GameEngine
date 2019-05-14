@@ -59,5 +59,7 @@ public class TopDownCamera extends Camera{
 			focalPoint.setRotY(-(float) (-90 - 90 + Math.toDegrees(Math.atan(xFromPlayer/yFromPlayer))));
 		}
 	}
+
+
 	
 }
