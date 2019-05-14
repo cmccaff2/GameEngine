@@ -45,7 +45,6 @@ public class PhysicsEntity extends Entity{
 			}else {
 				dXYZ.y = 0;
 				
-				System.out.println(Vector3f.dot(new Vector3f(terrainNormal.x, 0, terrainNormal.z), new Vector3f(terrainNormal.x, 0, terrainNormal.z)));
 				if (Vector3f.dot(new Vector3f(terrainNormal.x, 0, terrainNormal.z), new Vector3f(terrainNormal.x, 0, terrainNormal.z)) > 0.1) {
 					dXYZ.x += gravity * terrainNormal.x * time * friction;
 					dXYZ.z += gravity * terrainNormal.z * time * friction;

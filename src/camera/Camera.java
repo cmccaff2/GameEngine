@@ -82,7 +82,6 @@ public class Camera {
 	
 	public void setY(float y) {
 		this.position.y = y;
-		this.position = new Vector3f(position.x, y, position.z);
 	}
 	
 	public void setZ(float z) {

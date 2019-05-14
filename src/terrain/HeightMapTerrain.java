@@ -18,21 +18,21 @@ import toolbox.Maths;
 
 public class HeightMapTerrain extends Terrain{
 	
-	private static final float SIZE = 400;
+	private static final int SIZE = 128;
 	private static final float MAX_HEIGHT = 40;
 	private static final float MAX_PIXEL_COLOUR = 256*256*256;
 	
 	private float[][] heights;
 	private BufferedImage image;
 	
-	public HeightMapTerrain (int gridX, int gridZ, Loader loader, TerrainTexturePack texturePack, TerrainTexture blendMap, String heightMap) {
+	public HeightMapTerrain (int gridX, int gridZ, Loader loader, TerrainTexturePack texturePack, TerrainTexture blendMap, String heightMap, int imageX, int imageY) {
 		super(gridX, gridZ, loader, texturePack, blendMap);
 
-		super.model = generateTerrain(loader, heightMap);
+		super.model = generateTerrain(loader, heightMap, imageX, imageY);
+		super.heights = heights;
 	}
 
-	private RawModel generateTerrain(Loader loader, String heightMap){
-		
+	private RawModel generateTerrain(Loader loader, String heightMap, int imageX, int imageY){
 		image = null;
 		try {
 			image = ImageIO.read(new File("res/" + heightMap + ".png"));
@@ -41,7 +41,7 @@ public class HeightMapTerrain extends Terrain{
 			e.printStackTrace();
 		}
 		
-		int VERTEX_COUNT = image.getHeight();
+		int VERTEX_COUNT = SIZE;
 		heights = new float[VERTEX_COUNT][VERTEX_COUNT];	
 		int count = VERTEX_COUNT * VERTEX_COUNT;
 		float[] vertices = new float[count * 3];
@@ -49,14 +49,15 @@ public class HeightMapTerrain extends Terrain{
 		float[] textureCoords = new float[count*2];
 		int[] indices = new int[6*(VERTEX_COUNT-1)*(VERTEX_COUNT-1)];
 		int vertexPointer = 0;
-		for(int i=0;i<VERTEX_COUNT;i++){
-			for(int j=0;j<VERTEX_COUNT;j++){
+		
+		for(int i = 0; i < VERTEX_COUNT; i++){
+			for(int j = 0; j < VERTEX_COUNT; j++){
 				vertices[vertexPointer*3] = (float)j/((float)VERTEX_COUNT - 1) * SIZE;
-				float height = getHeight(j,i, image);
+				float height = getHeight(j + imageX, i + imageY, image);
 				heights[j][i] = height;
 				vertices[vertexPointer*3+1] = height;
 				vertices[vertexPointer*3+2] = (float)i/((float)VERTEX_COUNT - 1) * SIZE;
-				Vector3f normal = calculateNormal(j,i,image);
+				Vector3f normal = calculateNormal(j + imageX, i + imageY, image);
 				normals[vertexPointer*3] = normal.x;
 				normals[vertexPointer*3+1] = normal.y;
 				normals[vertexPointer*3+2] = normal.z;
@@ -65,7 +66,9 @@ public class HeightMapTerrain extends Terrain{
 				vertexPointer++;
 			}
 		}
+		
 		int pointer = 0;
+		
 		for(int gz=0;gz<VERTEX_COUNT-1;gz++){
 			for(int gx=0;gx<VERTEX_COUNT-1;gx++){
 				int topLeft = (gz*VERTEX_COUNT)+gx;
@@ -92,67 +95,7 @@ public class HeightMapTerrain extends Terrain{
 		normal.normalise();
 		return normal;
 	}
-	
-	public float getHeightOfTerrain(float worldX, float worldZ) {
-		float terrainX = worldX - this.getX();
-		float terrainZ = worldZ - this.getZ();
-		float gridSquareSize = SIZE / ((float)heights.length - 1);
-		int gridX = (int) Math.floor(terrainX / gridSquareSize); // Find which grid of the terrain this point falls on
-		int gridZ = (int) Math.floor(terrainZ / gridSquareSize);
 
-		if(gridX >= heights.length - 1 || gridZ >= heights.length - 1 || gridX < 0 || gridZ < 0) {
-			return 0;
-		}
-		
-		float xCoord = (terrainX % gridSquareSize)/gridSquareSize; // Find where on the grid the point is from (0,0) to (1,1)
-		float zCoord = (terrainZ % gridSquareSize)/gridSquareSize;
-		float height;
-		
-		if (xCoord <= (1-zCoord)) {
-			height = Maths.barryCentric(new Vector3f(0, heights[gridX][gridZ], 0), new Vector3f(1,
-							heights[gridX + 1][gridZ], 0), new Vector3f(0,
-							heights[gridX][gridZ + 1], 1), new Vector2f(xCoord, zCoord));
-		} else {
-			height = Maths.barryCentric(new Vector3f(1, heights[gridX + 1][gridZ], 0), new Vector3f(1,
-							heights[gridX + 1][gridZ + 1], 1), new Vector3f(0,
-							heights[gridX][gridZ + 1], 1), new Vector2f(xCoord, zCoord));
-		}
-
-		return height;
-
-	}
-	
-	public Vector3f getSlopeOfTerrain(float worldX, float worldZ) {
-		int terrainX = (int) (worldX - this.getX());
-		int terrainZ = (int) (worldZ - this.getZ());
-		float gridSquareSize = SIZE / ((float)heights.length - 1);
-		int gridX = (int) Math.floor(terrainX / gridSquareSize); // Find which grid of the terrain this point falls on
-		int gridZ = (int) Math.floor(terrainZ / gridSquareSize);
-
-		if(gridX >= heights.length - 1 || gridZ >= heights.length - 1 || gridX < 0 || gridZ < 0) {
-			return new Vector3f(0,0,0);
-		}
-		
-		float xCoord = (terrainX % gridSquareSize)/gridSquareSize; // Find where on the grid the point is from (0,0) to (1,1)
-		float zCoord = (terrainZ % gridSquareSize)/gridSquareSize;
-
-		Vector3f slope;
-		
-		if (xCoord <= (1-zCoord)) { // Top left triangle
-			slope = Maths.calculateSlope(new Vector3f(0, heights[gridX][gridZ], 0), new Vector3f(1,
-							heights[gridX + 1][gridZ], 0), new Vector3f(0,
-							heights[gridX][gridZ + 1], 1));
-		} else { // Bottom right triangle
-			slope = Maths.calculateSlope(new Vector3f(1, heights[gridX + 1][gridZ], 0), new Vector3f(1,
-							heights[gridX + 1][gridZ + 1], 1), new Vector3f(0,
-							heights[gridX][gridZ + 1], 1));
-		}
-
-		return slope;
-
-	}
-	
-	
 	private float getHeight(int x, int y, BufferedImage image) {
 		if(x < 0 || x>= image.getHeight() || y < 0 || y >= image.getHeight()) {
 			return 0;
